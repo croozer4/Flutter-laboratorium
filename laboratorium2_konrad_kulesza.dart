@@ -1,23 +1,21 @@
 void main() {
-  for (int i = 0; i < 5; i++) {
-    print('hello ${i + 1}');
-  }
+  
 }
 
 class Wypozyczalnia{
   List garaze = [];
   List pojazdy = [];
   
-  void usunPojazd(int id){
-    
+  void usunPojazd(int idDoUsuniecia){
+    pojazdy.removeWhere((element) => element['id'] == idDoUsuniecia);
   }
   
-  void dodajPojazd(){
-    
+  void dodajPojazd(Pojazd pojazdDoDodania){
+    pojazdy.add(pojazdDoDodania);
   }
   
   void wypiszWszystkiePojazdy(){
-    
+    print(pojazdy);
   }
   
   
@@ -35,12 +33,26 @@ abstract class Pojazd{
   
   Pojazd(String nazwaPojazdu){
     this.nazwaPojazdu = nazwaPojazdu;
+    
+    int maxId = 0;
+    
+    listaWszystkichPojazdow.forEach( (pojazd){
+      if(pojazd.id > maxId){
+        maxId = pojazd.id;
+      }
+    });
+    
+    id = maxId + 1; 
   }
 }
 
 abstract class Samochod extends Pojazd implements Spalinowy, Parkowalny{
   
-  late String rodzajPaliwa;
+  late String _rodzajPaliwa;
+  
+  String get rodzajPaliwa => _rodzajPaliwa;
+  set rodzajPaliwa(String value) => _rodzajPaliwa = value;
+  
   late Garaz aktualnyGaraz;
   int iloscPaliwa = 0;
   
@@ -71,6 +83,9 @@ abstract class Hulajnoga extends Pojazd{
 }
 
 class Spalinowy{
+  String get rodzajPaliwa;
+  set rodzajPaliwa(String value);
+  
   void tankowanie(int litry, String rodzajPaliwa){
     if(this.rodzajPaliwa == rodzajPaliwa){
       print("Zatankowano pojazd");
