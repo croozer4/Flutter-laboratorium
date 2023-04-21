@@ -94,9 +94,31 @@ class _MyHomePageState extends State<MyHomePage> {
     int aktualnaKomnata = labirynt[aktualnaPozycja[0]][aktualnaPozycja[1]];
     print("aktualna komnata to:" + aktualnaKomnata.toString());
 
-    setState(() {
+    isUpEnabled = false;
+    isLeftEnabled = false;
+    isRightEnabled = false;
+    isDownEnabled = false;
+
+    if(aktualnaKomnata == 0){
+      print("Wygrałeś!");
+    }
+
+    if(aktualnaKomnata >= 8){
+      isDownEnabled = true;
+      aktualnaKomnata -= 8;
+    }
+    if(aktualnaKomnata >= 4){
+      isUpEnabled = true;
+      aktualnaKomnata -= 4;
+    }
+    if(aktualnaKomnata >= 2){
+      isRightEnabled = true;
+      aktualnaKomnata -= 4;
+    }
+    if(aktualnaKomnata >= 1){
       isLeftEnabled = true;
-    });
+      aktualnaKomnata -= 1;
+    }
   }
 
   void moveUp(){
@@ -105,6 +127,7 @@ class _MyHomePageState extends State<MyHomePage> {
         aktualnaPozycja[0] -= 1;
       });
       wypiszAktualnaPozycja();
+      sprawdzMozliweRuchy();
     }
   }
   void moveDown(){
@@ -113,6 +136,7 @@ class _MyHomePageState extends State<MyHomePage> {
         aktualnaPozycja[0] += 1;
       });
       wypiszAktualnaPozycja();
+      sprawdzMozliweRuchy();
     }
   }
   void moveLeft(){
@@ -121,6 +145,7 @@ class _MyHomePageState extends State<MyHomePage> {
         aktualnaPozycja[1] -= 1;
       });
       wypiszAktualnaPozycja();
+      sprawdzMozliweRuchy();
     }
   }
   void moveRight(){
@@ -129,6 +154,7 @@ class _MyHomePageState extends State<MyHomePage> {
         aktualnaPozycja[1] += 1;
       });
       wypiszAktualnaPozycja();
+      sprawdzMozliweRuchy();
     }
   }
 
@@ -153,8 +179,8 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     if(!punkt_startowy_znaleziony){
       odnajdzPozycjeStartowa();
+      sprawdzMozliweRuchy();
     }
-    sprawdzMozliweRuchy();
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -187,6 +213,32 @@ class _MyHomePageState extends State<MyHomePage> {
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            Center(
+              child: Column(
+                children: <Widget>[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(),
+                      ElevatedButton(onPressed: null, child: Text("")),
+                      ElevatedButton(onPressed: null, child: Text("")),
+                      ElevatedButton(onPressed: null, child: Text("")),
+                      ElevatedButton(onPressed: null, child: Text(""))
+                    ],
+
+                  ),
+                  Row(
+
+                  ),
+                  Row(
+
+                  ),
+                  Row(
+
+                  ),
+                ],
+              ),
+            ),
             Text(
                 "Znajdujesz się w: [" +
                     aktualnaPozycja[0].toString() +
@@ -194,7 +246,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     aktualnaPozycja[1].toString() +
                     "]"
             ),
-            ElevatedButton(onPressed: isUpEnabled ? () => moveUp : null, child: Icon(Icons.arrow_upward)),
+            ElevatedButton(onPressed: isUpEnabled ? () => moveUp() : null, child: Icon(Icons.arrow_upward)),
             Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -202,10 +254,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   SizedBox(width: 10), // add a 20px space
                   ElevatedButton(onPressed: null, child: Icon(Icons.circle)),
                   SizedBox(width: 10), // add a 20px space
-                  ElevatedButton(onPressed: isRightEnabled ? () => moveRight : null, child: Icon(Icons.arrow_forward))
+                  ElevatedButton(onPressed: isRightEnabled ? () => moveRight() : null, child: Icon(Icons.arrow_forward))
                 ]
             ),
-            ElevatedButton(onPressed: isDownEnabled ? () => moveDown : null, child: Icon(Icons.arrow_downward)),
+            ElevatedButton(onPressed: isDownEnabled ? () => moveDown() : null, child: Icon(Icons.arrow_downward)),
           ],
         ),
       ), // This trailing comma makes auto-formatting nicer for build methods.
