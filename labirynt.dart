@@ -57,6 +57,8 @@ class _MyHomePageState extends State<MyHomePage> {
     [6, 5, 6, 5]
   ];
 
+  bool punkt_startowy_znaleziony = false;
+
   void odnajdzPozycjeStartowa() {
     for (int i = 0; i < labirynt.length; i++) {
       for (int j = 0; j < labirynt[i].length; j++) {
@@ -75,41 +77,59 @@ class _MyHomePageState extends State<MyHomePage> {
         "]");
 
     labirynt[aktualnaPozycja[0]][aktualnaPozycja[1]] -= 16;
+    punkt_startowy_znaleziony = true;
   }
-  
+
   void wypiszAktualnaPozycja(){
     print(aktualnaPozycja[0].toString() + "," + aktualnaPozycja[1].toString());
   }
 
+  bool isUpEnabled = false;
+  bool isLeftEnabled = false;
+  bool isRightEnabled = false;
+  bool isDownEnabled = false;
+
   void sprawdzMozliweRuchy(){
+
     int aktualnaKomnata = labirynt[aktualnaPozycja[0]][aktualnaPozycja[1]];
     print("aktualna komnata to:" + aktualnaKomnata.toString());
-    bool down;
-    bool up;
-    bool right;
-    bool left;
 
+    setState(() {
+      isLeftEnabled = true;
+    });
   }
 
   void moveUp(){
-    aktualnaPozycja[0] -= 1;
-    wypiszAktualnaPozycja();
-    sprawdzMozliweRuchy();
+    if(aktualnaPozycja[0] > 0){
+      setState(() {
+        aktualnaPozycja[0] -= 1;
+      });
+      wypiszAktualnaPozycja();
+    }
   }
   void moveDown(){
-    aktualnaPozycja[0] += 1;
-    wypiszAktualnaPozycja();
-    sprawdzMozliweRuchy();
+    if((labirynt.length - 1)> aktualnaPozycja[0]){
+      setState(() {
+        aktualnaPozycja[0] += 1;
+      });
+      wypiszAktualnaPozycja();
+    }
   }
   void moveLeft(){
-    aktualnaPozycja[1] -= 1;
-    wypiszAktualnaPozycja();
-    sprawdzMozliweRuchy();
+    if(aktualnaPozycja[1] > 0){
+      setState(() {
+        aktualnaPozycja[1] -= 1;
+      });
+      wypiszAktualnaPozycja();
+    }
   }
   void moveRight(){
-    aktualnaPozycja[1] += 1;
-    wypiszAktualnaPozycja();
-    sprawdzMozliweRuchy();
+    if((labirynt[1].length - 1) > aktualnaPozycja[1]){
+      setState(() {
+        aktualnaPozycja[1] += 1;
+      });
+      wypiszAktualnaPozycja();
+    }
   }
 
   List<int> aktualnaPozycja = [0, 0];
@@ -131,7 +151,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    odnajdzPozycjeStartowa();
+    if(!punkt_startowy_znaleziony){
+      odnajdzPozycjeStartowa();
+    }
+    sprawdzMozliweRuchy();
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -171,18 +194,18 @@ class _MyHomePageState extends State<MyHomePage> {
                     aktualnaPozycja[1].toString() +
                     "]"
             ),
-            ElevatedButton(onPressed: moveUp, child: Icon(Icons.arrow_upward)),
+            ElevatedButton(onPressed: isUpEnabled ? () => moveUp : null, child: Icon(Icons.arrow_upward)),
             Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  ElevatedButton(onPressed: moveLeft, child: Icon(Icons.arrow_back)),
+                  ElevatedButton(onPressed: isLeftEnabled ? () => moveLeft() : null, child: Icon(Icons.arrow_back)),
                   SizedBox(width: 10), // add a 20px space
                   ElevatedButton(onPressed: null, child: Icon(Icons.circle)),
                   SizedBox(width: 10), // add a 20px space
-                  ElevatedButton(onPressed: moveRight, child: Icon(Icons.arrow_forward))
+                  ElevatedButton(onPressed: isRightEnabled ? () => moveRight : null, child: Icon(Icons.arrow_forward))
                 ]
-              ),
-            ElevatedButton(onPressed: moveDown, child: Icon(Icons.arrow_downward)),
+            ),
+            ElevatedButton(onPressed: isDownEnabled ? () => moveDown : null, child: Icon(Icons.arrow_downward)),
           ],
         ),
       ), // This trailing comma makes auto-formatting nicer for build methods.
