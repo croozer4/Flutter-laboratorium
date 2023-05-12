@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
+import 'package:expressions/expressions.dart';
 
 void main() {
   runApp(const MyApp());
@@ -49,13 +51,92 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  String rownanie = '';
+  bool _wyswietlaWynik = false;
+
+  void _dodajDoRownania(String value) {
+    //jesli wyswietla wynik i nacisnieta jest cyfra to wyzeruj rownanie
+    if (_wyswietlaWynik && (value == '0' || value == '1' || value == '2' || value == '3' || value == '4' || value == '5' || value == '6' || value == '7' || value == '8' || value == '9')) {
+      setState(() {
+        rownanie = '';
+        _wyswietlaWynik = false;
+      });
+    }
+    _wyswietlaWynik = false;
+
+    // sprawdz czy nie jest to znak równa się
+    if (value == '=') {
+      _oblicz();
+      return;
+    }
+    // sprawdz czy nie jest to znak C
+    if (value == 'C') {
+      setState(() {
+        rownanie = '';
+      });
+      return;
+    }
+
+    // sprawdz czy uzyto przycisku Num, jesli tak to uzyj pow do obliczenia
+    if (value == 'Num') {
+      setState(() {
+        rownanie += 'pow(';
+      });
+      return;
+    }
+
+    //sprawdz czy ostatnim znakiem nie jest . lub znak działania matematycznego
+    if (rownanie != '' && (value == '.' || value == '+' || value == '-' || value == '*' || value == '/')) {
+      String ostatniZnak = rownanie.substring(rownanie.length - 1);
+      if (ostatniZnak == '.' || ostatniZnak == '+' || ostatniZnak == '-' || ostatniZnak == '*' || ostatniZnak == '/') {
+        return;
+      }
+    }
+
+    setState(() {
+      rownanie += value;
+    });
+  }
+
+  void _oblicz() {
+    setState(() {
+      try {
+        setState(() {
+          rownanie = eval(rownanie).toString();
+          _wyswietlaWynik = true;
+        });
+        // rownanie = eval(rownanie).toString();
+      } catch (e) {
+        rownanie = 'Error';
+      //  display e in console
+        print(e);
+      }
+    });
+  }
+
+  num eval(String expression) {
+    Expression exp = Expression.parse(expression);
+
+    var context = {
+      "x": pi / 5,
+      "cos": cos,
+      "sin": sin,
+      "Num": pow
+    };
+
+// Evaluate expression
+    final evaluator = const ExpressionEvaluator();
+    var r = evaluator.eval(exp, context);
+    // print(r);
+    return r;
+  }
 
   Widget _buildButton(String text) {
     return SizedBox(
       width: (MediaQuery.of(context).size.width / 5),
       height: (MediaQuery.of(context).size.width / 5),
       child: ElevatedButton(
-        onPressed: () {},
+        onPressed: () {_dodajDoRownania(text);},
         style: ElevatedButton.styleFrom(
           primary: Colors.amber,
           shape: RoundedRectangleBorder(
@@ -77,7 +158,7 @@ class _MyHomePageState extends State<MyHomePage> {
       width: (MediaQuery.of(context).size.width / 5),
       height: (MediaQuery.of(context).size.width / 5) * 2,
       child: ElevatedButton(
-        onPressed: () {},
+        onPressed: () {_dodajDoRownania(text);},
         style: ElevatedButton.styleFrom(
           primary: Colors.amber,
           shape: RoundedRectangleBorder(
@@ -144,6 +225,7 @@ class _MyHomePageState extends State<MyHomePage> {
               width: szerokoscInterfejsu,
               child: Center(
                 child: TextField(
+                  controller: TextEditingController(text: rownanie),
                   textAlign: TextAlign.right,
                   style: TextStyle(
                     fontSize: 30.0,
@@ -222,7 +304,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Spacer(),
-                          _buildButton('0'),
+                          _buildButton('C'),
                           Spacer(),
                           _buildButton('0'),
                           Spacer(),
