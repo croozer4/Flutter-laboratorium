@@ -53,8 +53,30 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   String rownanie = '';
   bool _wyswietlaWynik = false;
+  bool _rozpoczetaPotega = false;
+  bool _rozpoczetaPotega2 = false;
 
   void _dodajDoRownania(String value) {
+
+    //jestli _rozpoczetaPotega2 i ostatnim znakiem jest cyfra i nacisnieto przycisk Num to dodaj prawy nawias do rownania
+    if (_rozpoczetaPotega2 && rownanie != '' && value == 'Num' && rownanie.substring(rownanie.length - 1) != ',' && rownanie.substring(rownanie.length - 1) != '(') {
+      setState(() {
+        rownanie += ')';
+        _rozpoczetaPotega2 = false;
+      });
+      return;
+    }
+
+    //jesli potega jest rozpoczeta i ostatnim znakiem jest cyfra i nacisnieto przycisk Num to dodaj przecinek do rownania
+    if (_rozpoczetaPotega && rownanie != '' && value == 'Num' && rownanie.substring(rownanie.length - 1) != ',' && rownanie.substring(rownanie.length - 1) != '(') {
+      setState(() {
+        rownanie += ',';
+        _rozpoczetaPotega = false;
+        _rozpoczetaPotega2 = true;
+      });
+      return;
+    }
+
     //jesli wyswietla wynik i nacisnieta jest cyfra to wyzeruj rownanie
     if (_wyswietlaWynik && (value == '0' || value == '1' || value == '2' || value == '3' || value == '4' || value == '5' || value == '6' || value == '7' || value == '8' || value == '9')) {
       setState(() {
@@ -73,14 +95,17 @@ class _MyHomePageState extends State<MyHomePage> {
     if (value == 'C') {
       setState(() {
         rownanie = '';
+        _rozpoczetaPotega2 = false;
+        _rozpoczetaPotega = false;
       });
       return;
     }
 
     // sprawdz czy uzyto przycisku Num, jesli tak to uzyj pow do obliczenia
-    if (value == 'Num') {
+    if (value == 'Num' && !_rozpoczetaPotega2 && !_rozpoczetaPotega) {
       setState(() {
         rownanie += 'pow(';
+        _rozpoczetaPotega = true;
       });
       return;
     }
@@ -94,7 +119,11 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     setState(() {
+      if(_rozpoczetaPotega && value == 'Num' || _rozpoczetaPotega2 && value == 'Num') {
+        return;
+      }
       rownanie += value;
+      return;
     });
   }
 
@@ -121,7 +150,7 @@ class _MyHomePageState extends State<MyHomePage> {
       "x": pi / 5,
       "cos": cos,
       "sin": sin,
-      "Num": pow
+      "pow": pow
     };
 
 // Evaluate expression
@@ -173,17 +202,6 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
     );
-  }
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
   }
 
   @override
@@ -343,18 +361,9 @@ class _MyHomePageState extends State<MyHomePage> {
               ],
             ),
           ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
